@@ -1,4 +1,5 @@
 (function(){
+    let container = document.querySelector(".container");
     let video = document.querySelector(".mi-video");
     let playPauseBtn = document.querySelector(".playPauseBtn");
     let fullScreenBtn = document.querySelector(".full_screen");
@@ -8,8 +9,10 @@
     let full_duration = document.querySelector(".full_duration");
     let current_time = document.querySelector(".current_time");
     let progress = document.querySelector(".progress");
+    let reset = document.querySelector(".fa-rotate-right");
     
     function bindEvents(){
+        video.addEventListener("click", playPause);
         playPauseBtn.addEventListener("click", playPause);
         fullScreenBtn.addEventListener("click", enterFullScreen);
 
@@ -18,7 +21,13 @@
 
         video.addEventListener("timeupdate", updateTime);
 
-       
+        progress.addEventListener("click", skipVideo);
+
+        reset.addEventListener('click', e =>{
+            video.play();
+                video.currentTime= 0;
+            });
+
     }
     bindEvents();
 
@@ -84,7 +93,44 @@
 
             current_time.innerHTML = minutesCur + ":" + secondsCur
         }
+
+        function skipVideo(e){
+            let coords = getRelativeCoordinates(e);
+            let conWidth = container.offsetWidth;
+
+            let percentage = (coords.x * 100) /conWidth;
+            bar.style.width = percentage + "%";
+
+            let time = video.duration * (percentage / 100);
+            video.currentTime = time;
+        }
+        
+       
+
+        /* funcion adelantar o atras */
+        function getRelativeCoordinates ( e ) {
+            var pos = {}, offset = {}, ref;
+
+            ref = container.offsetParent;
+
+            pos.x = !! e.touches ? e.touches [ 0 ].pageX : e.pageX;
+            pos.Y = !! e.touches ? e.touches [ 0 ].pageY : e.pageY;
+
+            offset.left = container.offsetLeft;
+            offset.top = container.offsetTop;
+
+            while ( ref) {
+                offset.left += ref.offsetLeft;
+                offset.top += ref.offsetTop;
+
+                ref = ref.offsetParent;
+            }
         
 
-        
+        return {
+            x : pos.x - offset.left,
+            y : pos.y - offset.top,
+        };
+    
+    }  
 })();
